@@ -1,6 +1,11 @@
-backend/.venv
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Backend files that we won't be tracking for backend
+backend/.venv
+backend/supabase/.env
+
+
+# We won't tracking the following files for frontend
 # dependencies
 frontend/node_modules
 frontend/.pnp
