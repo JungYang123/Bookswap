@@ -20,6 +20,7 @@ cd backend
 python3 -m venv .venv # create a virtual environment 
 pip install -r requirements.txt # Install all the module/frameworks requirments 
 cd supabase
+# Make sure you have the .env file with all the Keys, URLs info for Supabase then move on to the below command
 uvicorn main:app --reload --port 8000 # Now your backend is running on local 8000 port 
 ```
 
