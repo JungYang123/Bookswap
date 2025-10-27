@@ -1,27 +1,22 @@
-# Bookswap
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-First, run the frontend development server:
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-Second, setup your backend developement and run it
-
-```bash
-cd backend
-python3 -m venv .venv # create a virtual environment 
-pip install -r requirements.txt # Install all the module/frameworks requirments 
-cd supabase
-uvicorn main:app --reload --port 8000 # Now your backend is running on local 8000 port 
-```
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
