@@ -39,3 +39,6 @@ frontend/.vercel
 # typescript
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+
+backend/supabase/.venv/
+backend/supabase/__pycache__
