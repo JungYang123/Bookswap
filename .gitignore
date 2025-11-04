@@ -3,6 +3,7 @@
 # Backend files that we won't be tracking for backend
 backend/.venv
 backend/supabase/.env
+backend/supabase/.venv
 
 
 # We won't tracking the following files for frontend
