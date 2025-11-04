@@ -10,7 +10,11 @@ export default function MainPage() {
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    
+    const [searchTerm, setSearchTerm] = useState("");
+    const filteredBooks = books.filter((book) =>
+        book.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     useEffect(() => {
         fetchBooks();
     }, []);
@@ -61,7 +65,7 @@ export default function MainPage() {
     return (
         <div className="min-h-screen w-full bg-gradient-to-br from-emerald-950 via-green-900 to-black text-white">
             <header className="sticky top-0 z-10 backdrop-blur-lg bg-emerald-950/70 border-b border-yellow-600 shadow-lg">
-                <div className="w-auto px-6 py-5 flex items-center justify-between">
+                <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full px-6 py-4">
                     {/*logo and title*/}
                     <div className="flex items-center gap-3">
                         <img
@@ -74,7 +78,7 @@ export default function MainPage() {
                         </span>  
                     </div>
                     {/*navigation options*/}
-                    <div className="flex gap-4 p-4 rounded-xl border border-yellow-500">
+                    <div className="gap-4 p-4 rounded-xl border border-yellow-500">
                         {options.map((option) => (
                             <button
                                 key={option}
@@ -91,16 +95,18 @@ export default function MainPage() {
                         ))}                              
                     </div>
                     {/*search bar*/}
+                    <div className="flex justify-end w-full">
                     <input
                             type="text"
                             placeholder="Search"
-                            className="flex justify-end w-auto rounded-2xl border border-yellow-500/50 bg-white/10 text-yellow-50 placeholder-yellow-200/70 px-4 py-3 shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400/60 backdrop-blur-md"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex w-lg rounded-2xl border border-yellow-500/50 bg-white/10 text-yellow-50 placeholder-yellow-200/70 px-4 py-3 shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400/60 backdrop-blur-md"
                         />
+                    </div>
                 </div>
             </header>
-            {/*main content area*/}
             <main className="p-8">
-                {/*use imported listing card component here*/}
                     {books.length === 0 ? (
                         <div className="text-center py-12">
                         <p className="text-lg text-zinc-600 dark:text-zinc-400">
@@ -109,7 +115,7 @@ export default function MainPage() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {books.map((book) => (
+                        {filteredBooks.map((book) => (
                             <ListingCard key={book.id} book={book} />
                         ))}
                         </div>
