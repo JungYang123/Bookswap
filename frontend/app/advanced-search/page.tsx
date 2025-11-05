@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
-/** ----- Types for filters ----- */
+/**Types for filtersssss*/
 type SearchBy = "Any" | "Title" | "Author" | "Subject" | "ISBN" | "Genre";
 type Condition = "Contains" | "Contains exact phrase" | "Starts with";
 type MaterialType = "All items" | "Articles" | "Books" | "Journals";
@@ -21,7 +21,7 @@ type Listing = {
   created_at?: string | null;
 };
 
-/** ----- Helpers ----- */
+/** Helpers */
 const mtLabelToValue = (m: MaterialType) =>
   m === "Books" ? "book" : m === "Journals" ? "journal" : m === "Articles" ? "article" : undefined;
 
@@ -41,7 +41,7 @@ const debounce = <T extends (...a: any[]) => void>(fn: T, delay = 350) => {
 };
 
 export default function AdvancedSearchPage() {
-  /** ----- UI / filters state (keeps your layout) ----- */
+  /** ----- UI / filters stateeee */
   const [showFilters, setShowFilters] = useState(true); // toggled by Advanced Search button
   const [term, setTerm] = useState("");
   const [searchBy, setSearchBy] = useState<SearchBy>("Any");
@@ -69,7 +69,7 @@ export default function AdvancedSearchPage() {
     // Friendly error if env is wrong (prevents "Invalid API key" spam)
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
       setErr(
-        "Search is not configured. Ask your team to set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local."
+        "Search is not configured. yet"
       );
       setItems([]);
       setTotal(0);
@@ -170,7 +170,7 @@ export default function AdvancedSearchPage() {
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
-  /** ===== RENDER (keeps your visual design) ===== */
+  /** ===== RENDER  ===== */
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-emerald-950 via-green-900 to-black text-white">
       {/* Header (unchanged look) */}
@@ -308,7 +308,7 @@ export default function AdvancedSearchPage() {
             </ul>
           )}
 
-          {/* Pagination (unchanged look) */}
+          {/* Pagination  */}
           <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm">
               <span>Page size</span>
