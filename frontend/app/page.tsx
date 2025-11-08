@@ -1,4 +1,5 @@
 import Image from "next/image";
+import bookCard from "./components/listing-card"; 
 
 export default function Home() {
   return (
