@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from routers import books
 # from routers import 
 
 # Load environment variables
@@ -21,11 +22,14 @@ app.add_middleware(
 
 # Include routers
 # Example: app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+app.include_router(books.router, prefix="/books", tags=["Books"])
 
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to GMU-BookSwap API"}
+
+
 
 
 

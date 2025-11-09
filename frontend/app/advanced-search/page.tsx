@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+//import { supabase } from "@/lib/supabaseClient";
 
 /** ----- Types for filters ----- */
 type SearchBy = "Any" | "Title" | "Author" | "Subject" | "ISBN" | "Genre";
