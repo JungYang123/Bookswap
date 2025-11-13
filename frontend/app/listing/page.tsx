@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import TopNavbar from "@/app/components/top-navbar";
 
 /** ----- Types for filters ----- */
@@ -292,15 +293,23 @@ export default function AdvancedSearchPage() {
           ) : (
             <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {items.map((r) => (
-                <li key={r.id} className="rounded-xl border border-yellow-300/40 bg-gradient-to-br from-emerald-950/70 to-black/80 p-4 hover:shadow-[0_0_25px_rgba(255,215,0,0.3)] transition-all">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="capitalize text-yellow-300 font-semibold">Buy</span>
-                    {/* {r.trade_type} */}
-                    <span className="font-bold text-yellow-400">${r.price}</span>
-                  </div>
-                  <div className="mt-2 text-base font-semibold text-yellow-100">{r.title}</div>
-                  <div className="text-sm text-yellow-200/80">{r.author}</div>
-                  <div className="mt-2 text-xs uppercase text-yellow-400/80 tracking-wider">{r.material_type}</div>
+                <li key={r.id}>
+                  <Link
+                    href={`/listing/${r.id}`}
+                    className="block rounded-xl border border-yellow-300/40 bg-gradient-to-br from-emerald-950/70 to-black/80 p-4 hover:shadow-[0_0_25px_rgba(255,215,0,0.3)] transition-all"
+                  >
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="capitalize text-yellow-300 font-semibold">
+                        {r.trade_type}
+                      </span>
+                      <span className="font-bold text-yellow-400">${r.price}</span>
+                    </div>
+                    <div className="mt-2 text-base font-semibold text-yellow-100">{r.title}</div>
+                    <div className="text-sm text-yellow-200/80">{r.author}</div>
+                    <div className="mt-2 text-xs uppercase text-yellow-400/80 tracking-wider">
+                      {r.material_type}
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
