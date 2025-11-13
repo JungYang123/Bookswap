@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-//import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 
 /** ----- Types for filters ----- */
-type SearchBy = "Any" | "Title" | "Author" | "Subject" | "ISBN" | "Genre";
+type SearchBy = "Any" | "Title" | "Author" | "ISBN" | "Genre";
 type Condition = "Contains" | "Contains exact phrase" | "Starts with";
 type MaterialType = "All items" | "Articles" | "Books" | "Journals";
 type Sort = "relevance" | "newest" | "price-asc" | "price-desc";
@@ -12,7 +12,6 @@ type Listing = {
   id: number;
   title: string;
   author?: string | null;
-  subject?: string | null;
   isbn?: string | null;
   genre?: string | null;
   material_type: "book" | "journal" | "article";
@@ -82,7 +81,7 @@ export default function AdvancedSearchPage() {
     let q = supabase
       .from("listings")
       .select(
-        "id,title,author,subject,isbn,genre,material_type,trade_type,price,created_at",
+        "id,title,author,isbn,genre,material_type,trade_type,price,created_at",
         { count: "exact" }
       )
       .range((page - 1) * pageSize, page * pageSize - 1);
@@ -100,14 +99,12 @@ export default function AdvancedSearchPage() {
           [
             `title.ilike.${pat}`,
             `author.ilike.${pat}`,
-            `subject.ilike.${pat}`,
             `isbn.ilike.${pat}`,
             `genre.ilike.${pat}`,
           ].join(",")
         );
       } else if (searchBy === "Title") q = q.ilike("title", pat);
       else if (searchBy === "Author") q = q.ilike("author", pat);
-      else if (searchBy === "Subject") q = q.ilike("subject", pat);
       else if (searchBy === "Genre") q = q.ilike("genre", pat);
       else if (searchBy === "ISBN") {
         q = condition === "Contains exact phrase" ? q.eq("isbn", trimmed) : q.ilike("isbn", pat);
@@ -228,7 +225,7 @@ export default function AdvancedSearchPage() {
                   value={searchBy}
                   onChange={(e) => setSearchBy(e.target.value as SearchBy)}
                 >
-                  {(["Any","Title","Author","Subject","ISBN","Genre"] as SearchBy[]).map(v => (
+                  {(["Any","Title","Author","ISBN","Genre"] as SearchBy[]).map(v => (
                     <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
