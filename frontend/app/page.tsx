@@ -1,11 +1,13 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import Link from "next/link"
 import Image from "next/image"
 import "./auth.css"
 
 export default function HomePage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")
@@ -21,7 +23,10 @@ export default function HomePage() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) setMessage(error.message)
-    else setMessage("Login successful! Redirecting...")
+    else {
+      setMessage("Login successful! Redirecting...")
+      router.push("/listing")
+    }
   }
 
   return (
