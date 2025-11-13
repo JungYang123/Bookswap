@@ -21,6 +21,11 @@ export default function TopNavbar() {
               {btn}
             </button>
           ))}
+          <button
+            className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
+          >
+            Cart
+          </button>
         </nav>
       </div>
     </header>
