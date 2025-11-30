@@ -25,7 +25,8 @@ export default function HomePage() {
     if (error) setMessage(error.message)
     else {
       setMessage("Login successful! Redirecting...")
-      router.push("/listing")
+      // Use window.location for full page reload to ensure clean state
+      window.location.href = "/listing"
     }
   }
 

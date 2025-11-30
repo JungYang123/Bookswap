@@ -132,9 +132,9 @@ export default function BookPage() {
             <p className="text-yellow-200 mb-2">
               <span className="font-semibold text-yellow-400">ISBN:</span> {isbn}
             </p>
-            <p className="text-yellow-200 mb-2">
+            {/* <p className="text-yellow-200 mb-2">
               <span className="font-semibold text-yellow-400">Database ID:</span> {listing?.id ?? listingID}
-            </p>
+            </p> */}
             <p className="text-yellow-200 mb-2">
               <span className="font-semibold text-yellow-400">Author:</span> {author}
             </p>
@@ -172,11 +172,11 @@ export default function BookPage() {
         )}
       </main>
 
-      <footer className="mt-10 bg-emerald-950/80 text-yellow-400 text-center py-4 backdrop-blur-md border-t border-yellow-500/30 shadow-inner">
+      {/* <footer className="mt-10 bg-emerald-950/80 text-yellow-400 text-center py-4 backdrop-blur-md border-t border-yellow-500/30 shadow-inner">
         <p className="text-sm">
           Powered by Supabase & Next.js · George Mason University © {new Date().getFullYear()}
         </p>
-      </footer>
+      </footer> */}
     </div>
   );
 }

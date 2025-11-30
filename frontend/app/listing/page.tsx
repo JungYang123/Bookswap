@@ -56,7 +56,7 @@ export default function AdvancedSearchPage() {
   const [pageSize, setPageSize] = useState(12);
 
   /** ----- Status ----- */
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start as true to show loading on initial mount
   const [err, setErr] = useState<string | null>(null);
 
   /** ----- Debounced search term for live typing ----- */
@@ -159,15 +159,25 @@ export default function AdvancedSearchPage() {
    *  - Any filter change
    *  - Clicking Advanced Search (immediate)
    */
-  const prevKey = useRef("");
+  const prevFiltersKey = useRef("");
+  const prevPage = useRef(1);
+  
   useEffect(() => {
-    const key = JSON.stringify({ searchBy, condition, debounced, materialType, sort, page, pageSize });
-    const changed = prevKey.current && prevKey.current !== key;
-    prevKey.current = key;
-    // Auto-search on change (debounced typing)
+    const filtersKey = JSON.stringify({ searchBy, condition, debounced, materialType, sort });
+    const filtersChanged = prevFiltersKey.current && prevFiltersKey.current !== filtersKey;
+    const pageChanged = prevPage.current !== page;
+    
+    // Update refs
+    prevFiltersKey.current = filtersKey;
+    prevPage.current = page;
+    
+    // Run query on mount or when filters/page change
     runQuery(debounced);
-    // Reset to page 1 whenever a non-page control changes
-    if (changed) setPage(1);
+    
+    // Reset to page 1 whenever filters change (but not page itself)
+    if (filtersChanged && !pageChanged && page !== 1) {
+      setPage(1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchBy, condition, debounced, materialType, sort, page, pageSize]);
 
@@ -348,11 +358,11 @@ export default function AdvancedSearchPage() {
         </section>
       </main>
 
-      <footer className="mt-10 bg-emerald-950/80 text-yellow-400 text-center py-4 backdrop-blur-md border-t border-yellow-500/30 shadow-inner">
+      {/* <footer className="mt-10 bg-emerald-950/80 text-yellow-400 text-center py-4 backdrop-blur-md border-t border-yellow-500/30 shadow-inner">
         <p className="text-sm">
-          Powered by Supabase & Next.js · George Mason University © {new Date().getFullYear()}
+          George Mason University © {new Date().getFullYear()}
         </p>
-      </footer>
+      </footer> */}
     </div>
   );
 }
