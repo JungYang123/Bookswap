@@ -23,6 +23,62 @@ export default function BookPage() {
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
+  const [coverLoading, setCoverLoading] = useState(false);
+
+  // Fetch book cover from API
+  useEffect(() => {
+    const isbn = listing?.isbn;
+    if (!isbn || typeof isbn !== 'string') {
+      setCoverImageUrl(null);
+      return;
+    }
+
+    // Clean ISBN: remove spaces and ensure proper format
+    const cleanIsbn = isbn.replace(/\s+/g, "").trim();
+    if (!cleanIsbn) {
+      setCoverImageUrl(null);
+      return;
+    }
+
+    let ignore = false;
+    const controller = new AbortController();
+
+    async function fetchBookCover() {
+      setCoverLoading(true);
+      try {
+        const response = await fetch(
+          `https://bookcover.longitood.com/bookcover/${encodeURIComponent(cleanIsbn)}`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch book cover");
+        }
+
+        const data = await response.json();
+        if (!ignore && data.url) {
+          setCoverImageUrl(data.url);
+        }
+      } catch (err) {
+        if (!ignore && !(err instanceof DOMException && err.name === "AbortError")) {
+          // Silently fail - we'll use fallback image
+          setCoverImageUrl(null);
+        }
+      } finally {
+        if (!ignore) {
+          setCoverLoading(false);
+        }
+      }
+    }
+
+    fetchBookCover();
+
+    return () => {
+      ignore = true;
+      controller.abort();
+    };
+  }, [listing?.isbn]);
 
   useEffect(() => {
     if (!listingID) {
@@ -82,7 +138,8 @@ export default function BookPage() {
     return "Contact seller";
   }, [listing?.price]);
 
-  const coverImage = listing?.image_url || "/strawberry.png";
+  // Use fetched cover image, fallback to listing image_url, then default image
+  const coverImage = coverImageUrl || listing?.image_url || "/strawberry.png";
   const title = listing?.title || (loading ? "Loading…" : "Unknown Title");
   const isbn = listing?.isbn || "Not provided";
   const author = listing?.author || "Unknown";
@@ -121,11 +178,24 @@ export default function BookPage() {
       <main className="mx-auto max-w-6xl p-6 space-y-8">
         {/* Book Listing Card */}
         <div className="flex items-center gap-8 bg-emerald-900/40 border border-yellow-600/40 rounded-2xl shadow-xl p-6 hover:bg-emerald-800/40 transition-all">
-          <img
-            src={coverImage}
-            alt={`${title} Cover`}
-            className="w-100 h-100 object-cover rounded-xl shadow-md border border-yellow-500/30"
-          />
+          <div className="relative flex-shrink-0">
+            {coverLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-emerald-950/50 rounded-xl">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400"></div>
+              </div>
+            )}
+            <img
+              src={coverImage}
+              alt={`${title} Cover`}
+              className="w-48 h-72 object-cover rounded-xl shadow-md border border-yellow-500/30"
+              onError={(e) => {
+                // Fallback to default image if cover fails to load
+                if (coverImageUrl) {
+                  e.currentTarget.src = listing?.image_url || "/strawberry.png";
+                }
+              }}
+            />
+          </div>
 
           <div className="flex flex-col">
             <h1 className="text-3xl font-bold text-yellow-300 mb-2">{title}</h1>
