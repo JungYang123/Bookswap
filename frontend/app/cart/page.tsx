@@ -8,7 +8,7 @@ export default function CartPage() {
 
   const handleCheckout = () => {
     // Dummy checkout - just show an alert
-    alert("Checkout functionality coming soon!");
+    alert("Checkout functionality! :)");
   };
 
   return (
