@@ -20,14 +20,44 @@ export default function TopNavbar() {
           </span>
         </Link>
         <nav className="flex gap-3">
-          {["Borrow", "Trade", "Buy", "Sell"].map((btn) => (
+          {/* {["Borrow", "Trade", "Buy"].map((btn) => (
             <button
               key={btn}
               className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
             >
               {btn}
             </button>
-          ))}
+          ))} */}
+          <Link
+            href="/listing"
+            className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
+          >
+           Borrow
+          </Link>
+          <Link
+            href="/listing"
+            className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
+          >
+            Trade
+          </Link>
+          <Link
+            href="/listing"
+            className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
+          >
+            Buy
+          </Link>
+          <Link
+            href="/sell"
+            className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
+          >
+            Sell
+          </Link>
+          <Link
+            href="/my-listings"
+            className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
+          >
+            My Listings
+          </Link>
           <Link
             href="/cart"
             className="relative rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
