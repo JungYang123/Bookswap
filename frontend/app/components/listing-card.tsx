@@ -27,9 +27,9 @@ export default function ListingCard({ book }: ListingCardProps) {
       <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-2">
         by {book.author}
       </p>
-      <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-4">
+      {/* <p className="text-sm text-zinc-500 dark:text-zinc-500 mb-4">
         ISBN: {book.isbn}
-      </p>
+      </p> */}
       <p className="text-zinc-700 dark:text-zinc-300 mb-4 line-clamp-3">
         {book.description}
       </p>

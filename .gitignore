@@ -6,6 +6,7 @@ backend/supabase/.env
 backend/supabase/.venv
 
 
+
 # We won't tracking the following files for frontend
 # dependencies
 frontend/node_modules
@@ -40,3 +41,4 @@ frontend/.vercel
 # typescript
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+backend/supabase/__pycache__
