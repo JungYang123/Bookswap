@@ -7,7 +7,6 @@ export default function CartPage() {
   const { cartItems, removeFromCart, clearCart, getCartTotal } = useCart();
 
   const handleCheckout = () => {
-    // Dummy checkout - just show an alert
     alert("Checkout functionality! :)");
   };
 
