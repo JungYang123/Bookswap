@@ -1,36 +1,15 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import TopNavbar from "@/app/components/top-navbar";
+import BookListingCard, { type BookListing } from "@/app/components/book-listing-card";
 
-/** ----- Types for filters ----- */
 type SearchBy = "Any" | "Title" | "Author" | "ISBN" | "Genre";
 type Condition = "Contains" | "Contains exact phrase" | "Starts with";
 type MaterialType = "All items" | "Articles" | "Books" | "Journals";
 type Sort = "relevance" | "newest" | "price-asc" | "price-desc";
 
-type Listing = {
-  id: number;
-  title: string;
-  author?: string | null;
-  isbn?: string | null;
-  genre?: string | null;
-  material_type: "book" | "journal" | "article";
-  trade_type: "buy" | "trade" | "borrow";
-  price: number;
-  created_at?: string | null;
-};
-
-/** ----- Helpers ----- */
 const mtLabelToValue = (m: MaterialType) =>
   m === "Books" ? "book" : m === "Journals" ? "journal" : m === "Articles" ? "article" : undefined;
-
-const toPattern = (cond: Condition, term: string) => {
-  if (!term) return "%";
-  if (cond === "Starts with") return `${term}%`;
-  if (cond === "Contains exact phrase") return `%${term}%`; // we still use ilike, exact phrase handled for ISBN with eq below
-  return `%${term}%`;
-};
 
 const debounce = <T extends (...a: any[]) => void>(fn: T, delay = 350) => {
   let t: ReturnType<typeof setTimeout> | null = null;
@@ -41,28 +20,23 @@ const debounce = <T extends (...a: any[]) => void>(fn: T, delay = 350) => {
 };
 
 export default function AdvancedSearchPage() {
-  /** ----- UI / filters state (keeps your layout) ----- */
-  const [showFilters, setShowFilters] = useState(true); // toggled by Advanced Search button
+  const [showFilters, setShowFilters] = useState(true);
   const [term, setTerm] = useState("");
   const [searchBy, setSearchBy] = useState<SearchBy>("Any");
   const [condition, setCondition] = useState<Condition>("Contains");
   const [materialType, setMaterialType] = useState<MaterialType>("All items");
   const [sort, setSort] = useState<Sort>("relevance");
 
-  /** ----- Data & paging ----- */
-  const [items, setItems] = useState<Listing[]>([]);
+  const [items, setItems] = useState<BookListing[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
-
-  /** ----- Status ----- */
-  const [loading, setLoading] = useState(true); // Start as true to show loading on initial mount
+  const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
-  /** ----- Debounced search term for live typing ----- */
   const [debounced, setDebounced] = useState("");
   const debouncer = useMemo(() => debounce(setDebounced, 400), []);
-  useEffect(() => debouncer(term), [term]); // live type → debounce
+  useEffect(() => debouncer(term), [term, debouncer]);
 
   /** ----- Build & run query (core logic the button triggers) ----- */
   async function runQuery(activeTerm: string) {
@@ -78,20 +52,17 @@ export default function AdvancedSearchPage() {
       
       const data = await response.json();
       
-      // Filter and sort client-side (backend doesn't support query params yet)
       let filtered = Array.isArray(data) ? [...data] : [];
       
-      // Material type filter
       const mt = mtLabelToValue(materialType);
       if (mt) {
-        filtered = filtered.filter((item: Listing) => item.material_type === mt);
+        filtered = filtered.filter((item: BookListing) => item.material_type === mt);
       }
 
-      // Search filter
       const trimmed = activeTerm.trim();
       if (trimmed) {
         const searchLower = trimmed.toLowerCase();
-        filtered = filtered.filter((item: Listing) => {
+        filtered = filtered.filter((item: BookListing) => {
           if (searchBy === "Any") {
             return (
               item.title?.toLowerCase().includes(searchLower) ||
@@ -124,26 +95,24 @@ export default function AdvancedSearchPage() {
         });
       }
 
-      // Sort
       if (sort === "newest") {
-        filtered.sort((a: Listing, b: Listing) => {
+        filtered.sort((a, b) => {
           const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
           const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
           return dateB - dateA;
         });
       } else if (sort === "price-asc") {
-        filtered.sort((a: Listing, b: Listing) => (a.price || 0) - (b.price || 0));
+        filtered.sort((a, b) => a.price - b.price);
       } else if (sort === "price-desc") {
-        filtered.sort((a: Listing, b: Listing) => (b.price || 0) - (a.price || 0));
+        filtered.sort((a, b) => b.price - a.price);
       }
 
-      // Pagination
       const total = filtered.length;
       const start = (page - 1) * pageSize;
       const end = start + pageSize;
       const paginated = filtered.slice(start, end);
 
-      setItems(paginated as Listing[]);
+      setItems(paginated);
       setTotal(total);
     } catch (err) {
       setErr(err instanceof Error ? err.message : "An error occurred");
@@ -154,11 +123,6 @@ export default function AdvancedSearchPage() {
     }
   }
 
-  /** ----- Trigger rules -----
-   *  - Typing (debounced)
-   *  - Any filter change
-   *  - Clicking Advanced Search (immediate)
-   */
   const prevFiltersKey = useRef("");
   const prevPage = useRef(1);
   
@@ -167,31 +131,24 @@ export default function AdvancedSearchPage() {
     const filtersChanged = prevFiltersKey.current && prevFiltersKey.current !== filtersKey;
     const pageChanged = prevPage.current !== page;
     
-    // Update refs
     prevFiltersKey.current = filtersKey;
     prevPage.current = page;
     
-    // Run query on mount or when filters/page change
     runQuery(debounced);
     
-    // Reset to page 1 whenever filters change (but not page itself)
     if (filtersChanged && !pageChanged && page !== 1) {
       setPage(1);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchBy, condition, debounced, materialType, sort, page, pageSize]);
 
-  // Button: open/close panel and run an immediate search (no debounce)
   function onAdvancedClick() {
     setShowFilters((s) => !s);
     runQuery(term);
-    // scroll to results
     requestAnimationFrame(() => {
       document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
     });
   }
 
-  // Enter key in the main search
   function onEnter(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
       setPage(1);
@@ -202,7 +159,6 @@ export default function AdvancedSearchPage() {
 
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
 
-  /** ===== RENDER (keeps your visual design) ===== */
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-emerald-950 via-green-900 to-black text-white">
       <TopNavbar />
@@ -319,39 +275,10 @@ export default function AdvancedSearchPage() {
             <ul className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {items.map((r) => (
                 <li key={r.id} className="h-full">
-                  <Link
-                    href={`/listing/${r.id}`}
-                    className="block h-full rounded-xl border border-yellow-400/30 bg-gradient-to-br from-emerald-950/80 via-emerald-900/60 to-black/90 p-5 hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(255,215,0,0.4)] hover:scale-[1.02] transition-all duration-300 flex flex-col"
-                  >
-                    {/* Header: Trade type badge and price */}
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-300 border border-yellow-400/40">
-                        {r.trade_type}
-                      </span>
-                      <span className="text-xl font-bold text-yellow-400 drop-shadow-lg">
-                        ${r.price.toFixed(2)}
-                      </span>
-                    </div>
-
-                    {/* Title - main content */}
-                    <h3 className="text-lg font-bold text-yellow-50 mb-2 line-clamp-2 leading-tight flex-grow">
-                      {r.title}
-                    </h3>
-
-                    {/* Author */}
-                    {r.author && (
-                      <div className="text-sm text-yellow-200/90 mb-3 line-clamp-1">
-                        by {r.author}
-                      </div>
-                    )}
-
-                    {/* Footer: Material type badge */}
-                    <div className="mt-auto pt-3 border-t border-yellow-400/20">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wider text-yellow-400/90 bg-yellow-500/10">
-                        {r.material_type}
-                      </span>
-                    </div>
-                  </Link>
+                  <BookListingCard
+                    listing={r}
+                    variant="default"
+                  />
                 </li>
               ))}
             </ul>
