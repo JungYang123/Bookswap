@@ -1,44 +1,46 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useCart } from "../../contexts/CartContext";
 import TopNavbar from "../../components/top-navbar";
-
-type Listing = {
-  id: number | string;
-  title: string;
-  author?: string | null;
-  isbn?: string | null;
-  genre?: string | null;
-  material_type?: string | null;
-  trade_type?: string | null;
-  price?: number | null;
-  condition?: string | null;
-  description?: string | null;
-  image_url?: string | null;
-};
+import type { BookListing } from "../../components/book-listing-card";
 
 export default function BookPage() {
   const params = useParams<{ listingID: string }>();
   const listingID = params?.listingID;
   const { addToCart, cartItems } = useCart();
 
-  const [listing, setListing] = useState<Listing | null>(null);
+  const [listing, setListing] = useState<BookListing | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [mailtoLink, setMailtoLink] = useState<string>("");
 
-  // Fetch book cover from API
+  // Generate mailto link on client side
   useEffect(() => {
+    if (listing?.seller_email && listing?.title) {
+      const subject = encodeURIComponent(`bookswap - ${listing.title}`);
+      const body = encodeURIComponent(
+        `I'd like to buy '${listing.title}' that is listed on GMU Bookswap.\n\nListing: ${window.location.href}`
+      );
+      setMailtoLink(`mailto:${listing.seller_email}?subject=${subject}&body=${body}`);
+    }
+  }, [listing?.seller_email, listing?.title]);
+
+  useEffect(() => {
+    if (listing?.image_url) {
+      setCoverImageUrl(null);
+      return;
+    }
+
     const isbn = listing?.isbn;
     if (!isbn || typeof isbn !== 'string') {
       setCoverImageUrl(null);
       return;
     }
 
-    // Clean ISBN: remove spaces and ensure proper format
     const cleanIsbn = isbn.replace(/\s+/g, "").trim();
     if (!cleanIsbn) {
       setCoverImageUrl(null);
@@ -66,7 +68,6 @@ export default function BookPage() {
         }
       } catch (err) {
         if (!ignore && !(err instanceof DOMException && err.name === "AbortError")) {
-          // Silently fail - we'll use fallback image
           setCoverImageUrl(null);
         }
       } finally {
@@ -82,7 +83,7 @@ export default function BookPage() {
       ignore = true;
       controller.abort();
     };
-  }, [listing?.isbn]);
+  }, [listing?.isbn, listing?.image_url]);
 
   useEffect(() => {
     if (!listingID) {
@@ -142,7 +143,6 @@ export default function BookPage() {
     return "Contact seller";
   }, [listing?.price]);
 
-  // Use fetched cover image, fallback to listing image_url, then default image
   const coverImage = coverImageUrl || listing?.image_url || "/strawberry.png";
   const title = listing?.title || (loading ? "Loading…" : "Unknown Title");
   const isbn = listing?.isbn || "Not provided";
@@ -168,7 +168,6 @@ export default function BookPage() {
               alt={`${title} Cover`}
               className="w-48 h-72 object-cover rounded-xl shadow-md border border-yellow-500/30"
               onError={(e) => {
-                // Fallback to default image if cover fails to load
                 if (coverImageUrl) {
                   e.currentTarget.src = listing?.image_url || "/strawberry.png";
                 }
@@ -190,9 +189,14 @@ export default function BookPage() {
             <p className="text-yellow-200 mb-2">
               <span className="font-semibold text-yellow-400">Condition:</span> {condition}
             </p>
-            <p className="text-yellow-200 mb-4">
+            <p className="text-yellow-200 mb-2">
               <span className="font-semibold text-yellow-400">Price:</span> {priceLabel}
             </p>
+            {listing?.seller_email && (
+              <p className="text-yellow-200 mb-4">
+                <span className="font-semibold text-yellow-400">Seller:</span> {listing.seller_email}
+              </p>
+            )}
             <p className="text-yellow-100 leading-relaxed mb-4">{description}</p>
             <div className="flex gap-3">
               <button
@@ -212,26 +216,25 @@ export default function BookPage() {
                   }
                 }}
                 disabled={loading || !!error || !listing || cartItems.some(item => item.id === listing.id)}
-                className="rounded-full border border-yellow-400/70 bg-yellow-500/10 
-                hover:bg-yellow-400/20 px-6 py-2 text-yellow-300 
+                className="rounded-full border border-yellow-400/70 bg-yellow-500/10
+                hover:bg-yellow-400/20 px-6 py-2 text-yellow-300
                 font-medium transition-all shadow-sm backdrop-blur-md disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {cartItems.some(item => item.id === listing?.id) 
-                  ? "Already in Cart" 
-                  : addedToCart 
-                    ? "Added to Cart!" 
+                {cartItems.some(item => item.id === listing?.id)
+                  ? "Already in Cart"
+                  : addedToCart
+                    ? "Added to Cart!"
                     : "Add to Cart"}
               </button>
-              {listing?.trade_type && (
-                <button
-                  onClick={() => console.log("Listing ID:", listing?.id ?? listingID)}
-                  disabled={loading || !!error}
-                  className="rounded-full border border-yellow-400/70 bg-yellow-500/10 
-                  hover:bg-yellow-400/20 px-4 py-2 text-yellow-300 
-                  font-medium transition-all shadow-sm backdrop-blur-md disabled:opacity-40"
+              {mailtoLink && (
+                <a
+                  href={mailtoLink}
+                  className="rounded-full bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-300
+                  text-black px-6 py-2 font-semibold transition-all shadow-[0_0_15px_rgba(255,215,0,0.4)]
+                  hover:shadow-[0_0_25px_rgba(255,215,0,0.8)] backdrop-blur-md"
                 >
-                  Request to {listing.trade_type}
-                </button>
+                  Buy Now
+                </a>
               )}
             </div>
           </div>
