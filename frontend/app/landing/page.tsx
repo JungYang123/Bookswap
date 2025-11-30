@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ListingCard from "../components/listing-card";
 import type { Book } from "../components/listing-card";  
 
-export default function MainPage() {
+export default function Landing() {
     const options = ["Buy", "Sell", "Borrow", "Trade"];
     const [selected, setSelected] = useState("Buy");
     const [books, setBooks] = useState<Book[]>([]);
