@@ -1,6 +1,8 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { useCart } from "../../contexts/CartContext";
+import TopNavbar from "../../components/top-navbar";
 
 type Listing = {
   id: number | string;
@@ -19,12 +21,14 @@ type Listing = {
 export default function BookPage() {
   const params = useParams<{ listingID: string }>();
   const listingID = params?.listingID;
+  const { addToCart, cartItems } = useCart();
 
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [coverLoading, setCoverLoading] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   // Fetch book cover from API
   useEffect(() => {
@@ -148,32 +152,7 @@ export default function BookPage() {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-emerald-950 via-green-900 to-black text-white">
-      <header className="sticky top-0 z-10 backdrop-blur-lg bg-emerald-950/70 border-b border-yellow-600 shadow-lg">
-        <div className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/gmu-logo.jpg"
-              alt="George Mason University"
-              className="h-10 w-auto rounded-md shadow-[0_0_10px_rgba(255,215,0,0.6)] hover:scale-110 transition-transform"
-            />
-            <span className="text-3xl font-extrabold tracking-wide text-yellow-400 drop-shadow-lg">
-              GMUBookSwap
-            </span>
-          </div>
-          <nav className="flex gap-3">
-            {["Borrow", "Trade", "Buy", "Sell"].map((btn) => (
-              <button
-                key={btn}
-                className="rounded-full border border-yellow-400/70 bg-yellow-500/10 
-                hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 
-                font-medium transition-all shadow-sm backdrop-blur-md"
-              >
-                {btn}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <TopNavbar />
 
       <main className="mx-auto max-w-6xl p-6 space-y-8">
         {/* Book Listing Card */}
@@ -215,17 +194,46 @@ export default function BookPage() {
               <span className="font-semibold text-yellow-400">Price:</span> {priceLabel}
             </p>
             <p className="text-yellow-100 leading-relaxed mb-4">{description}</p>
-            <p className="text-yellow-200">
+            <div className="flex gap-3">
               <button
-                onClick={() => console.log("Listing ID:", listing?.id ?? listingID)}
-                disabled={loading || !!error}
+                onClick={() => {
+                  if (listing) {
+                    addToCart({
+                      id: listing.id,
+                      title: listing.title,
+                      author: listing.author,
+                      price: listing.price || 0,
+                      image_url: coverImageUrl || listing.image_url,
+                      isbn: listing.isbn,
+                      trade_type: listing.trade_type,
+                    });
+                    setAddedToCart(true);
+                    setTimeout(() => setAddedToCart(false), 2000);
+                  }
+                }}
+                disabled={loading || !!error || !listing || cartItems.some(item => item.id === listing.id)}
                 className="rounded-full border border-yellow-400/70 bg-yellow-500/10 
-                hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 
-                font-medium transition-all shadow-sm backdrop-blur-md disabled:opacity-40"
+                hover:bg-yellow-400/20 px-6 py-2 text-yellow-300 
+                font-medium transition-all shadow-sm backdrop-blur-md disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                {listing?.trade_type ? `Request to ${listing.trade_type}` : "Buy"}
+                {cartItems.some(item => item.id === listing?.id) 
+                  ? "Already in Cart" 
+                  : addedToCart 
+                    ? "Added to Cart!" 
+                    : "Add to Cart"}
               </button>
-            </p>
+              {listing?.trade_type && (
+                <button
+                  onClick={() => console.log("Listing ID:", listing?.id ?? listingID)}
+                  disabled={loading || !!error}
+                  className="rounded-full border border-yellow-400/70 bg-yellow-500/10 
+                  hover:bg-yellow-400/20 px-4 py-2 text-yellow-300 
+                  font-medium transition-all shadow-sm backdrop-blur-md disabled:opacity-40"
+                >
+                  Request to {listing.trade_type}
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
