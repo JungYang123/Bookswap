@@ -293,31 +293,63 @@ export default function AdvancedSearchPage() {
         )}
 
         {/* Results */}
-        <section id="results" className="rounded-2xl border border-yellow-400/40 bg-white/5 backdrop-blur-lg p-5 shadow">
+        <section id="results" className="rounded-2xl border border-yellow-400/40 bg-white/5 backdrop-blur-lg p-6 shadow">
           {loading ? (
-            <p className="text-yellow-300">Loading results…</p>
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mb-3"></div>
+                <p className="text-yellow-300 text-lg">Loading results…</p>
+              </div>
+            </div>
           ) : err ? (
-            <div className="text-red-400">{err}</div>
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <p className="text-red-400 text-lg font-semibold mb-2">Error loading listings</p>
+                <p className="text-red-300/80 text-sm">{err}</p>
+              </div>
+            </div>
           ) : items.length === 0 ? (
-            <div className="text-yellow-100">No results. Try a different term or broaden filters.</div>
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <p className="text-yellow-200 text-lg font-semibold mb-2">No results found</p>
+                <p className="text-yellow-300/70 text-sm">Try a different search term or broaden your filters.</p>
+              </div>
+            </div>
           ) : (
-            <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {items.map((r) => (
-                <li key={r.id}>
+                <li key={r.id} className="h-full">
                   <Link
                     href={`/listing/${r.id}`}
-                    className="block rounded-xl border border-yellow-300/40 bg-gradient-to-br from-emerald-950/70 to-black/80 p-4 hover:shadow-[0_0_25px_rgba(255,215,0,0.3)] transition-all"
+                    className="block h-full rounded-xl border border-yellow-400/30 bg-gradient-to-br from-emerald-950/80 via-emerald-900/60 to-black/90 p-5 hover:border-yellow-400/60 hover:shadow-[0_0_30px_rgba(255,215,0,0.4)] hover:scale-[1.02] transition-all duration-300 flex flex-col"
                   >
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="capitalize text-yellow-300 font-semibold">
+                    {/* Header: Trade type badge and price */}
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-300 border border-yellow-400/40">
                         {r.trade_type}
                       </span>
-                      <span className="font-bold text-yellow-400">${r.price}</span>
+                      <span className="text-xl font-bold text-yellow-400 drop-shadow-lg">
+                        ${r.price.toFixed(2)}
+                      </span>
                     </div>
-                    <div className="mt-2 text-base font-semibold text-yellow-100">{r.title}</div>
-                    <div className="text-sm text-yellow-200/80">{r.author}</div>
-                    <div className="mt-2 text-xs uppercase text-yellow-400/80 tracking-wider">
-                      {r.material_type}
+
+                    {/* Title - main content */}
+                    <h3 className="text-lg font-bold text-yellow-50 mb-2 line-clamp-2 leading-tight flex-grow">
+                      {r.title}
+                    </h3>
+
+                    {/* Author */}
+                    {r.author && (
+                      <div className="text-sm text-yellow-200/90 mb-3 line-clamp-1">
+                        by {r.author}
+                      </div>
+                    )}
+
+                    {/* Footer: Material type badge */}
+                    <div className="mt-auto pt-3 border-t border-yellow-400/20">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wider text-yellow-400/90 bg-yellow-500/10">
+                        {r.material_type}
+                      </span>
                     </div>
                   </Link>
                 </li>
@@ -325,36 +357,40 @@ export default function AdvancedSearchPage() {
             </ul>
           )}
 
-          {/* Pagination (unchanged look) */}
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm">
-              <span>Page size</span>
-              <select
-                className="rounded-xl border border-yellow-400/50 bg-white/10 px-2 py-1"
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-              >
-                {[12,24,48].map(n => <option key={n} value={n}>{n}</option>)}
-              </select>
+          {/* Pagination */}
+          {items.length > 0 && (
+            <div className="mt-6 pt-5 border-t border-yellow-400/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-yellow-200/90">
+                <span className="font-medium">Items per page:</span>
+                <select
+                  className="rounded-lg border border-yellow-400/50 bg-white/10 text-yellow-50 px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-yellow-400/60 transition-all"
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                >
+                  {[12,24,48].map(n => <option key={n} value={n} className="bg-emerald-950">{n}</option>)}
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  className="rounded-lg border border-yellow-400/50 bg-white/10 text-yellow-50 px-4 py-2 hover:bg-yellow-400/20 hover:border-yellow-400/70 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/10 transition-all font-medium"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </button>
+                <span className="text-sm text-yellow-200/90 font-medium min-w-[100px] text-center">
+                  Page {page} of {Math.max(1, Math.ceil(total / pageSize))}
+                </span>
+                <button
+                  className="rounded-lg border border-yellow-400/50 bg-white/10 text-yellow-50 px-4 py-2 hover:bg-yellow-400/20 hover:border-yellow-400/70 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white/10 transition-all font-medium"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page >= pageCount}
+                >
+                  Next
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                className="rounded-xl border border-yellow-400/50 bg-white/10 px-3 py-2 disabled:opacity-40"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-              >
-                Previous
-              </button>
-              <span className="text-sm">Page {page} / {Math.max(1, Math.ceil(total / pageSize))}</span>
-              <button
-                className="rounded-xl border border-yellow-400/50 bg-white/10 px-3 py-2 disabled:opacity-40"
-                onClick={() => setPage((p) => p + 1)}
-                disabled={page >= pageCount}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          )}
         </section>
       </main>
 
