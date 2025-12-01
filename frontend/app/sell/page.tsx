@@ -263,11 +263,11 @@ export default function SellPage() {
                       name="material_type"
                       value={formData.material_type}
                       onChange={handleInputChange}
-                      className="w-full rounded-xl border border-yellow-400/50 bg-white/10 text-yellow-50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400/60"
+                      className="w-full rounded-xl border border-yellow-400/50 bg-white/10 text-yellow-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400/60"
                     >
-                      <option value="book">Book</option>
-                      <option value="journal">Journal</option>
-                      <option value="article">Article</option>
+                      <option value="book" style={{ color: "#071121" }} >Book</option>
+                      <option value="journal" style={{ color: "#071121" }} >Journal</option>
+                      <option value="article" style={{ color: "#071121" }} >Article</option>
                     </select>
                   </div>
 
@@ -277,7 +277,7 @@ export default function SellPage() {
                       name="trade_type"
                       value={formData.trade_type}
                       onChange={handleInputChange}
-                      className="w-full rounded-xl border border-yellow-400/50 bg-white/10 text-yellow-50 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400/60"
+                      className="w-full rounded-xl border border-yellow-400/50 bg-white/10 text-yellow-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400/60"
                     >
                       <option value="buy">Buy</option>
                       <option value="trade">Trade</option>
