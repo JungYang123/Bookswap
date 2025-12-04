@@ -28,7 +28,7 @@ export default function TopNavbar() {
               {btn}
             </button>
           ))} */}
-          <Link
+          {/* <Link
             href="/listing"
             className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
           >
@@ -39,7 +39,7 @@ export default function TopNavbar() {
             className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
           >
             Trade
-          </Link>
+          </Link> */}
           <Link
             href="/listing"
             className="rounded-full border border-yellow-400/70 bg-yellow-500/10 hover:bg-yellow-400/20 px-4 py-1 text-yellow-300 font-medium transition-all shadow-sm backdrop-blur-md"
